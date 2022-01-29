@@ -1,0 +1,46 @@
+version: '3.6'
+services:
+  database:
+    container_name: database
+    build: ./docker/mysql
+    environment:
+      MYSQL_DATABASE: mysqldb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - 3306:3306
+    volumes:
+      - ./docker/mysql/initdb.d:/docker-entrypoint-initdb.d
+      - ./docker/mysql_db:/var/lib/mysql
+  backend:
+    container_name: backend
+    build: ./docker/spring
+    depends_on:
+      - database
+    ports:
+      - 8080:8080
+    tty: true
+    volumes:
+      - .:/srv:cached
+    working_dir: /srv
+  mock:
+    container_name: mock
+    image: stoplight/prism
+    ports:
+      - 4010:4010
+    volumes:
+      - ./specs/fityou-v1.0.yml:/app/openapi.yml
+    command: mock -h 0.0.0.0 -d /app/openapi.yml
+  document:
+    container_name: document
+    image: redocly/redoc
+    ports:
+      - 8081:80
+    volumes:
+      - ./specs/fityou-v1.0.yml:/usr/share/nginx/html/swagger.yml
+    environment:
+      SPEC_URL: swagger.yml
+volumes:
+  mysql_db:
+    driver: local

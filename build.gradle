@@ -1,0 +1,58 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id "org.openapi.generator" version "5.3.0"
+	id 'java'
+}
+
+ext {
+  openApiOutputDir = "$buildDir/generated/openapi"
+}
+
+group = 'com.fityou.fityouapi'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+sourceSets {
+  main {
+    java {
+      srcDirs= ['src/main/java', "$openApiOutputDir/src/main/java"]
+    }
+  }
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.1'
+  implementation 'org.openapitools:jackson-databind-nullable:0.2.1'
+	compileOnly 'io.swagger:swagger-annotations:1.6.2'
+	runtimeOnly 'mysql:mysql-connector-java'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+openApiGenerate {
+    generatorName = "spring"
+    inputSpec = "$rootDir/specs/fityou-v1.0.yml".toString()
+    outputDir = "$openApiOutputDir".toString()
+    apiPackage = "org.openapi.fityou.api"
+    invokerPackage = "org.openapi.fityou.invoker"
+    modelPackage = "org.openapi.fityou.model"
+    configOptions = [
+        dateLibrary: "java11",
+        interfaceOnly: "true"
+    ]
+		globalProperties = [
+        modelDocs: "false"
+    ]
+}
+
+compileJava.dependsOn tasks.openApiGenerate

@@ -1,0 +1,162 @@
+openapi: 3.0.3
+info:
+  title: FitYou API
+  version: '1.0'
+  description: YouTubeフィットネス動画管理アプリFitYou用API
+  contact:
+    name: Yusuke Maruyama
+    email: circlemountain.ym@gmail.com
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /users:
+    get:
+      summary: GetUsers
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+              examples:
+                example-1:
+                  value:
+                    - id: 1
+                      name: Taro
+          headers: {}
+      operationId: get-users
+      description: ユーザ一覧を取得
+    post:
+      summary: CreateUser
+      tags: []
+      operationId: post-users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+            examples:
+              example-1:
+                value:
+                  name: Taro
+      description: 新規ユーザーの登録
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/users/{userId}':
+    parameters:
+      - schema:
+          type: integer
+        name: userId
+        in: path
+        required: true
+        description: ユーザID
+    get:
+      summary: GetUserById
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+      operationId: get-user-userId
+      parameters: []
+      description: ID情報を元に特定のユーザを取得
+    patch:
+      summary: UpdateUser
+      tags: []
+      operationId: patch-user-userId
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                example-1:
+                  value:
+                    name: Taro
+                    id: 0
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+      description: 特定のユーザ情報を更新
+    delete:
+      summary: DeleteUser
+      tags: []
+      operationId: delete-user-userId
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      description: 特定のユーザ情報を削除
+components:
+  schemas:
+    User:
+      title: User
+      description: ユーザ情報
+      x-examples:
+        example-1:
+          id: 1
+          name: Taro
+      allOf:
+        - $ref: '#/components/schemas/NewUser'
+        - type: object
+          properties:
+            id:
+              type: integer
+          required:
+            - id
+    UserList:
+      title: UserList
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    NewUser:
+      title: CreateUserInput
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+        - name
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    UpdateUser:
+      title: UpdateUser
+      type: object
+      properties:
+        name:
+          type: string
+  responses: {}
