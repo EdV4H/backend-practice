@@ -1,0 +1,14 @@
+{
+  "name": "spring-mysql-prism-redoc",
+  "workspaceFolder": "/srv",
+  "dockerComposeFile": "../docker-compose.yml",
+  "settings": { 
+      "terminal.integrated.shell.linux": "/bin/bash"    
+  },
+  "service": "backend",
+  "extensions": [
+      "vscjava.vscode-java-pack",
+      "pivotal.vscode-boot-dev-pack",
+      "gabrielbb.vscode-lombok"
+  ]
+}
